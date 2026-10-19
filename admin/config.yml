@@ -1,15 +1,21 @@
 # Decap CMS: the admin panel at /admin
-# Every save is committed to GitHub (main), and Vercel republishes the site.
+# Edits are saved as drafts (pull requests). Publishing one merges it into main,
+# and Vercel republishes the site. People without write access to the repo can
+# still propose edits (open authoring); only a maintainer can publish them.
 backend:
   name: github
   repo: profamine/crm-alhaouz
   branch: main
   base_url: https://crm-alhaouz.online
   auth_endpoint: api/auth
+  open_authoring: true
   commit_messages:
     update: "تحديث {{slug}} من لوحة التحكم"
     uploadMedia: "رفع صورة {{path}}"
     deleteMedia: "حذف صورة {{path}}"
+    openAuthoring: "اقتراح تعديل من {{author-login}}: {{message}}"
+
+publish_mode: editorial_workflow
 
 locale: fr
 site_url: https://crm-alhaouz.online
