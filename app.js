@@ -1,13 +1,50 @@
-(() => {
+(async () => {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const img = n => `images/${n}.jpg`;
 
-  /* ---------- Google Form for training registration ----------
-     Paste the form link here (Google Forms → إرسال → رابط),
-     e.g. "https://docs.google.com/forms/d/e/XXXXXXXX/viewform".
-     Leave it empty to show the "registration opens soon" card. */
-  const TRAINING_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe64QAoSsIo4RwhGbA25mPMlbVId9IgY4EgDy_UlxWsrjj2ag/viewform";
+  /* ---------- content (edited from /admin, stored in /content/*.json) ---------- */
+  const load = name => fetch(`content/${name}.json`, { cache: "no-cache" })
+    .then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  const [settings, stats, news, office, courses, fieldsData, timeline, gallery, partnersData] =
+    await Promise.all(["settings", "stats", "news", "office", "courses", "fields", "timeline", "gallery", "partners"].map(load));
+  const list = o => Array.isArray(o && o.items) ? o.items : [];
+
+  const esc = v => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  // Images come from the CMS media folder or the original /images folder.
+  const src = p => { p = String(p || "").trim(); return /^(https:\/\/|\/|images\/)/.test(p) && !/^\/\//.test(p) ? esc(p) : ""; };
+  const digits = n => String(n || "").replace(/[^\d+]/g, "");
+  const localPhone = n => { const d = digits(n); return d.startsWith("+212") ? ("0" + d.slice(4)).replace(/(\d{2})(?=\d)/g, "$1 ").trim() : d; };
+  const waNumber = digits(settings.whatsapp || "+212668963619").replace("+", "");
+  const months = ["يناير", "فبراير", "مارس", "أبريل", "ماي", "يونيو", "يوليوز", "غشت", "شتنبر", "أكتوبر", "نونبر", "دجنبر"];
+  const parseDate = d => { const m = String(d || "").match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? { y: m[1], m: months[+m[2] - 1] || "", d: String(+m[3]) } : null; };
+  // Minimal markdown: paragraphs, "* " / "- " / "1. " lists, **bold**.
+  const md = text => esc(text).split(/\r?\n\s*\r?\n/).map(block => {
+    const lines = block.split(/\r?\n/).filter(Boolean);
+    const bold = s => s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    if (lines.length && lines.every(l => /^\s*[*-]\s+/.test(l))) return `<ul>${lines.map(l => `<li>${bold(l.replace(/^\s*[*-]\s+/, ""))}</li>`).join("")}</ul>`;
+    if (lines.length && lines.every(l => /^\s*\d+[.)]\s+/.test(l))) return `<ol>${lines.map(l => `<li>${bold(l.replace(/^\s*\d+[.)]\s+/, ""))}</li>`).join("")}</ol>`;
+    return lines.length ? `<p>${bold(lines.join("<br>"))}</p>` : "";
+  }).join("");
+
+  /* ---------- simple text bindings (hero) ---------- */
+  $$("[data-c]").forEach(el => { const v = settings[el.dataset.c]; if (v) el.textContent = v; });
+
+  /* ---------- phones & contact ---------- */
+  const phones = (settings.phones || []).filter(p => p && p.number);
+  $("#sosPhones").innerHTML = phones.map(p =>
+    `<a class="sos-branch" href="tel:${esc(digits(p.number))}">${esc(p.label || "الهلال الأحمر – الحوز")} <b dir="ltr">${esc(p.number)}</b></a>`).join("");
+  $("#contactList").innerHTML =
+    phones.map(p => `<li><span>الهاتف</span><a href="tel:${esc(digits(p.number))}" dir="ltr">${esc(localPhone(p.number))}</a></li>`).join("") +
+    `<li><span>واتساب</span><a href="https://wa.me/${esc(waNumber)}" target="_blank" rel="noopener">راسلنا مباشرة</a></li>` +
+    (settings.address ? `<li><span>العنوان</span>${esc(settings.address)}</li>` : "") +
+    (settings.facebook_name ? `<li><span>فيسبوك</span>${/^https:\/\//.test(settings.facebook_url || "")
+      ? `<a href="${esc(settings.facebook_url)}" target="_blank" rel="noopener">${esc(settings.facebook_name)}</a>` : esc(settings.facebook_name)}</li>` : "");
+
+  /* ---------- numbers ---------- */
+  $("#statsTitle").textContent = stats.title || "";
+  $("#statsSub").textContent = stats.subtitle || "";
+  $("#statsGrid").innerHTML = list(stats).map(s =>
+    `<div class="stat"><b class="count" data-to="${Math.max(0, parseInt(s.value, 10) || 0)}">0</b><span>${esc(s.label)}</span></div>`).join("");
 
   /* ---------- theme ---------- */
   const root = document.documentElement;
@@ -26,60 +63,84 @@
   });
   $$("#nav a").forEach(a => a.addEventListener("click", () => nav.classList.remove("open")));
 
-  /* ---------- fields ---------- */
-  const fields = [
-    { t: "التكوين في الإسعافات الأولية", s: "دورات في المدارس والجمعيات ولفائدة نساء ورجال التعليم.", img: "fa1", thumbs: ["fa3", "fa7", "fa6"],
-      items: ["دورة لفائدة 54 مربية ومربيًا من مؤسسات تعليمية مختلفة (يونيو 2024).",
-              "دورات بالثانوية الإعدادية مولاي رشيد وأوريكا والفضاء الجمعوي بتحناوت (ماي 2023).",
-              "برنامج الإسعافات الأولية للمدارس بدعم من الصليب الأحمر الفرنسي: آيت أورير وأوريكا ومدارس الجماعات المتضررة من الزلزال (2025).",
-              "دورات لنساء المجتمع المدني بأمزميز، وللشباب بمقر بلدية تحناوت."] },
-    { t: "الخدمات الصحية والاجتماعية", s: "قوافل طبية متعددة التخصصات وفحوصات للنظر والسمع.", img: "h3", thumbs: ["h2", "h5", "h7"],
-      items: ["تأطير الحملة الطبية لجراحة العيون بتحناوت لفائدة أكثر من 3200 مستفيد (غشت 2022).",
-              "الحملة الطبية متعددة التخصصات بأمزميز يومي 9 و10 ماي 2024.",
-              "قافلة الكشف المبكر عن السرطان بدوار بويحيى بشراكة مع جمعية «دار بابانا» (يونيو 2023).",
-              "قوافل الفحوصات الطبية لتصحيح النظر والسمع لفائدة تلاميذ المدارس العمومية (2024–2025)."] },
-    { t: "الرياضة والتطوع", s: "التغطية الإسعافية للبطولات والسباقات الجبلية.", img: "s1", thumbs: ["s2", "s4", "s5"],
-      items: ["التغطية الإسعافية للبطولة الجهوية لألعاب القوى بأغواطيم – تحناوت.",
-              "إسعاف المشاركين في سباق جبلي عالمي بمنطقة ماريغا (النسخ 2022 و2023 و2024).",
-              "المساهمة في إنجاح البطولة الوطنية المدرسية للعدو الريفي بتحناوت (25–28 أبريل 2024)."] },
-    { t: "السلامة الطرقية", s: "ورشات تطبيقية للأطفال واحتفال سنوي باليوم الوطني.", img: "r1", thumbs: ["r2", "r4", "r5"],
-      items: ["برنامج للتربية الطرقية في 30 مؤسسة تعليمية استفاد منه أكثر من 3000 متعلم.",
-              "تخليد اليوم الوطني للسلامة الطرقية (18 فبراير) كل سنة منذ 2022.",
-              "ورشات بشراكة مع جمعية تنمية التعاون المدرسي والمديرية الإقليمية للتربية الوطنية."] },
-    { t: "الدعم النفسي", s: "حصص الرسم والحكاية والتنشيط في مخيمات الناجين.", img: "eq_kids2", thumbs: ["eq_kids", "eq_camp2", "eq_camp3"],
-      items: ["حصص للدعم النفسي تكتشف نقاط الضعف عبر الرسم والتعبير بحضور أطباء ومختصين بشراكة مع جمعية شمس.",
-              "ورشات للرسم والتنشيط والحكاية في مخيمات الإيواء بعد الزلزال.",
-              "زيارات ميدانية منتظمة للمخيمات لتقديم الدعم الطبي والنفسي."] },
-    { t: "الروابط العائلية والمشاركة المجتمعية", s: "تكوين فرق RFL وتشخيص تشاركي مع الساكنة.", img: "fa8", thumbs: ["fa5", "fa10", "fa4"],
-      items: ["الدورة الثانية لتكوين فريق إعادة الروابط العائلية (R.F.L) بمدرسة السلام بآيت أورير.",
-              "برنامج المشاركة المجتمعية بثلاث نيعقوب مع الصليب الأحمر الإسباني والاتحاد الدولي (16–20 أكتوبر 2024).",
-              "المشاركة في دورة وطنية حول حماية الروابط العائلية (24–27 أكتوبر 2024)."] }
-  ];
-  $("#fieldGrid").innerHTML = fields.map((f, i) => `
-    <button class="field" data-i="${i}">
-      <img src="${img(f.img)}" alt="" loading="lazy">
-      <div class="field-inner">
-        <span class="num">0${i + 1}</span>
-        <h3>${f.t}</h3>
-        <p>${f.s}</p>
-        <span class="more">اكتشف المزيد ←</span>
-      </div>
-    </button>`).join("");
-
+  /* ---------- modal ---------- */
   const modal = $("#modal"), modalBody = $("#modalBody");
   let lastFocus = null;
   const openModal = html => { lastFocus = document.activeElement; modalBody.innerHTML = html; modal.hidden = false; $("#modalX").focus(); document.body.style.overflow = "hidden"; };
   const closeModal = () => { modal.hidden = true; document.body.style.overflow = ""; lastFocus && lastFocus.focus(); };
+  $("#modalX").addEventListener("click", closeModal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+
+  /* ---------- news ---------- */
+  const newsItems = list(news).filter(n => n && n.title).sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+  const dateBadge = n => { const d = parseDate(n.date); return d ? `<div class="news-date" aria-hidden="true"><b>${d.d}</b><span>${d.m}</span><span>${d.y}</span></div>` : ""; };
+  const dateText = n => { const d = parseDate(n.date); return d ? `${d.d} ${d.m} ${d.y}` : ""; };
+  const newsList = $("#newsList");
+  if (newsItems.length) {
+    const [top, ...rest] = newsItems;
+    newsList.innerHTML = `
+      <article class="news-card">
+        ${dateBadge(top)}
+        <div class="news-text">
+          <span class="kicker">آخر الأخبار</span>
+          <h2>${esc(top.title)}</h2>
+          ${top.subtitle ? `<p class="news-sub">${esc(top.subtitle)}</p>` : ""}
+          ${src(top.image) ? `<img class="news-img" src="${src(top.image)}" alt="" loading="lazy">` : ""}
+          ${md(top.body)}
+        </div>
+      </article>
+      ${rest.length ? `<h3 class="news-more-title">أخبار سابقة</h3>
+      <div class="news-grid">${rest.map((n, i) => `
+        <button class="news-mini" data-i="${i + 1}">
+          ${src(n.image) ? `<img src="${src(n.image)}" alt="" loading="lazy">` : ""}
+          <span class="nm-date">${esc(dateText(n))}</span>
+          <b>${esc(n.title)}</b>
+          ${n.subtitle ? `<span class="nm-sub">${esc(n.subtitle)}</span>` : ""}
+          <span class="more">اقرأ الخبر ←</span>
+        </button>`).join("")}</div>` : ""}`;
+    newsList.addEventListener("click", e => {
+      const b = e.target.closest(".news-mini"); if (!b) return;
+      const n = newsItems[+b.dataset.i];
+      openModal(`${src(n.image) ? `<img class="m-hero" src="${src(n.image)}" alt="">` : ""}
+        <div class="m-body"><span class="kicker">${esc(dateText(n))}</span><h2 id="modalTitle">${esc(n.title)}</h2>
+        ${n.subtitle ? `<p class="news-sub">${esc(n.subtitle)}</p>` : ""}${md(n.body)}</div>`);
+    });
+  }
+
+  /* ---------- office: board & roadmap ---------- */
+  const members = (office.members || []).filter(m => m && m.name);
+  $("#board").innerHTML = members.map(m =>
+    `<li class="${m.lead ? "board-lead" : ""}"><span class="b-ini">${esc([...String(m.name).trim()][0] || "")}</span><b>${esc(m.name)}</b><span>${esc(m.role)}</span></li>`).join("");
+  $("#roadmapTitle").textContent = office.roadmap_title || "";
+  $("#roadmapIntro").textContent = office.roadmap_intro || "";
+  $("#pillars").innerHTML = (office.pillars || []).map(p => `<li><b>${esc(p.title)}</b><span>${esc(p.text)}</span></li>`).join("");
+
+  /* ---------- courses ---------- */
+  const courseItems = list(courses).filter(c => c && c.title);
+  $("#courseList").innerHTML = courseItems.map(c => `<li>${esc(c.title)}</li>`).join("");
+  $("#regCourses").innerHTML = courseItems.filter(c => c.registration).map((c, i) =>
+    `<li><span>${String(i + 1).padStart(2, "0")}</span>${esc(c.title)}</li>`).join("");
+
+  /* ---------- fields ---------- */
+  const fields = list(fieldsData);
+  $("#fieldGrid").innerHTML = fields.map((f, i) => `
+    <button class="field" data-i="${i}">
+      <img src="${src(f.image)}" alt="" loading="lazy">
+      <div class="field-inner">
+        <span class="num">${String(i + 1).padStart(2, "0")}</span>
+        <h3>${esc(f.title)}</h3>
+        <p>${esc(f.summary)}</p>
+        <span class="more">اكتشف المزيد ←</span>
+      </div>
+    </button>`).join("");
   $("#fieldGrid").addEventListener("click", e => {
     const b = e.target.closest(".field"); if (!b) return;
     const f = fields[b.dataset.i];
-    openModal(`<img class="m-hero" src="${img(f.img)}" alt="">
-      <div class="m-body"><span class="kicker">مجال 0${+b.dataset.i + 1}</span><h2 id="modalTitle">${f.t}</h2>
-      <ul>${f.items.map(x => `<li>${x}</li>`).join("")}</ul>
-      <div class="m-thumbs">${f.thumbs.map(t => `<img src="${img(t)}" alt="" loading="lazy">`).join("")}</div></div>`);
+    openModal(`<img class="m-hero" src="${src(f.image)}" alt="">
+      <div class="m-body"><span class="kicker">مجال ${String(+b.dataset.i + 1).padStart(2, "0")}</span><h2 id="modalTitle">${esc(f.title)}</h2>
+      <ul>${(f.points || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+      <div class="m-thumbs">${(f.photos || []).map(t => `<img src="${src(t)}" alt="" loading="lazy">`).join("")}</div></div>`);
   });
-  $("#modalX").addEventListener("click", closeModal);
-  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
 
   /* ---------- quake aid table ---------- */
   const aid = [["توزيع المواد الغذائية", "أسني / وزكيطة"], ["توزيع الملابس والأفرشة", "مولاي إبراهيم"], ["توزيع الأغطية", "تغدوين / أوكايمدن"],
@@ -97,34 +158,14 @@
     `<p style="margin:16px 0 0;font-size:.82rem;color:var(--muted)">طول الأشرطة بمقياس لوغاريتمي حتى تظهر الأعداد الصغيرة بوضوح.</p>`;
 
   /* ---------- timeline ---------- */
-  const events = [
-    ["2022", "12 مارس", "✚", "تأطير نادي البيئة بمؤسسة واحة الزيتون 2", "ورشة في الإسعافات الأولية والصحة المدرسية بمراكش."],
-    ["2022", "25 مارس", "★", "انتخاب المكتب الإقليمي بتحناوت", "تجديد الثقة في الرئيس المصطفى عصبان وجميع الأعضاء."],
-    ["2022", "25 مارس", "♥", "مساعدات لـ130 أسرة بزرقطن", "مواد غذائية وأغطية وملابس بدعم من الهلال الأحمر الإماراتي."],
-    ["2022", "23 ماي", "✚", "حملة تحسيسية لـ3530 تلميذًا", "النظافة الشخصية والبيئة المدرسية في 8 مؤسسات ضمن برنامج الاستجابة لكوفيد-19."],
-    ["2022", "3 غشت", "◉", "الحملة الطبية لجراحة العيون", "أكثر من 3200 مستفيد بتحناوت ضمن برنامج «نور السعودية»."],
-    ["2022", "22 نونبر", "♥", "ملابس شتوية لـ217 تلميذًا", "مدرسة جماعاتية بأعالي الأطلس الكبير بشراكة مع جمعية «فريق النجاح»."],
-    ["2023", "فبراير", "⚑", "اليوم الوطني للسلامة الطرقية", "ورشات توعوية في عدة مؤسسات تعليمية بالإقليم."],
-    ["2023", "3 يونيو", "◉", "قافلة الكشف المبكر عن السرطان", "بدوار بويحيى، جماعة أغمات، بشراكة مع جمعية «دار بابانا»."],
-    ["2023", "شتنبر", "▲", "الاستجابة لزلزال الحوز", "تدخل فوري في أسني ومولاي إبراهيم وأمزميز وثلاث نيعقوب وغيرها."],
-    ["2024", "11–15 يناير", "♥", "مساعدات لـ165 أسرة متضررة", "لفائدة الأشخاص في وضعية إعاقة بصرية، بدعم من USAID."],
-    ["2024", "25–28 أبريل", "⚑", "البطولة الوطنية المدرسية للعدو الريفي", "تغطية إسعافية شاملة بتحناوت."],
-    ["2024", "9–10 ماي", "◉", "الحملة الطبية متعددة الاختصاصات بأمزميز", "بشراكة مع المديرية الإقليمية للصحة."],
-    ["2024", "16–20 أكتوبر", "★", "برنامج المشاركة المجتمعية", "بثلاث نيعقوب، بتعاون مع الصليب الأحمر الإسباني."],
-    ["2024", "نونبر", "⚑", "ذكرى المسيرة الخضراء", "ورشات توعوية في الإسعافات الأولية والسلامة."],
-    ["2025", "8 يناير", "✚", "انطلاق برنامج الإسعافات الأولية للمدارس", "بدعم من الصليب الأحمر الفرنسي، بمدرسة السلام بآيت أورير."],
-    ["2025", "18 يناير", "◉", "قافلة فحوصات النظر والسمع", "لفائدة تلاميذ دائرة آيت أورير."],
-    ["2025", "17–21 فبراير", "★", "التدريب الوطني التمهيدي بتارودانت", "الحركة الدولية للصليب الأحمر والهلال الأحمر."],
-    ["2025", "28 فبراير", "⚑", "اليوم العالمي للوقاية المدنية", "مشاركة في الاحتفال الإقليمي بتحناوت."],
-    ["2025", "18 ماي", "★", "الجمع العام التجديدي للمكتب الإقليمي", "تجديد الثقة في الرئيس مصطفى عصبان، وانتخاب مكتب جديد يقود خارطة طريق 2025–2028."]
-  ];
-  const years = ["الكل", "2022", "2023", "2024", "2025"];
+  const events = list(timeline).filter(e => e && e.title);
+  const years = ["الكل", ...[...new Set(events.map(e => String(e.year)))].sort()];
   const tabs = $("#yearTabs"), tl = $("#timeline");
-  tabs.innerHTML = years.map((y, i) => `<button role="tab" aria-selected="${i === 0}" data-y="${y}">${y}</button>`).join("");
+  tabs.innerHTML = years.map((y, i) => `<button role="tab" aria-selected="${i === 0}" data-y="${esc(y)}">${esc(y)}</button>`).join("");
   const renderTL = y => {
-    tl.innerHTML = events.filter(e => y === "الكل" || e[0] === y).map((e, i) =>
-      `<li class="tl" style="animation-delay:${i * 40}ms"><span class="tl-dot">${e[2]}</span>
-       <div class="tl-card"><time>${e[1]} ${e[0]}</time><h3>${e[3]}</h3><p>${e[4]}</p></div></li>`).join("");
+    tl.innerHTML = events.filter(e => y === "الكل" || String(e.year) === y).map((e, i) =>
+      `<li class="tl" style="animation-delay:${i * 40}ms"><span class="tl-dot">${esc(e.icon || "✚")}</span>
+       <div class="tl-card"><time>${esc(e.date)} ${esc(e.year)}</time><h3>${esc(e.title)}</h3><p>${esc(e.text)}</p></div></li>`).join("");
   };
   tabs.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
@@ -204,23 +245,14 @@
 
   /* ---------- gallery ---------- */
   const cats = { all: "الكل", fa: "التكوين", h: "الصحة", eq: "الزلزال", s: "الرياضة", r: "السلامة الطرقية", so: "التضامن" };
-  const gal = [
-    ["eq_trucks", "eq", "قافلة المساعدات في اتجاه الدواوير المتضررة"], ["fa1", "fa", "تمرين تطبيقي في الإسعافات الأولية"], ["h2", "h", "فحص النظر خلال الحملة الطبية"],
-    ["s1", "s", "خط الوصول في السباق الجبلي"], ["r1", "r", "أطفال يتعلمون قواعد السلامة الطرقية"], ["so1", "so", "تجهيز المساعدات الغذائية بزرقطن"],
-    ["eq_camp", "eq", "زيارة ميدانية لمخيم الإيواء"], ["fa2", "fa", "وضعية الإفاقة الجانبية"], ["h1", "h", "قافلة طبية بمدرسة أولاد يحيى"],
-    ["team2", "all", "الفريق الإقليمي في الميدان"], ["eq_unload", "eq", "تفريغ شاحنات الأغطية والأفرشة"], ["s4", "s", "إسعاف طفلة خلال بطولة العدو الريفي"],
-    ["fa7", "fa", "خريجو دورة الإسعافات الأولية"], ["r2", "r", "اليوم الوطني للسلامة الطرقية 2025"], ["so2", "so", "قافلة المساعدات الرمضانية بأكرفروان"],
-    ["eq_camp3", "eq", "متطوعو المكتب داخل مخيم الإيواء"], ["h4", "h", "الحملة الطبية متعددة الاختصاصات بأمزميز"], ["fa9", "fa", "التدريب على الإنعاش القلبي"],
-    ["s2", "s", "تغطية إسعافية لألعاب القوى"], ["eq_dist", "eq", "توزيع الملابس على الأطفال"], ["r4", "r", "ورشة السلامة الطرقية بالقسم"],
-    ["team4", "all", "تدشين برنامج الدعم المدرسي"], ["h5", "h", "زيارة ميدانية لمؤسسة صحية"], ["eq_help", "eq", "مساعدة شخص في وضعية إعاقة"],
-    ["fa6", "fa", "تسليم الشهادات للمتطوعين"], ["so3", "so", "توزيع القفف الرمضانية"], ["s3", "s", "خيمة الإسعاف في البطولة"], ["r5", "r", "مسرح العرائس للتوعية"]
-  ];
+  const gal = list(gallery).filter(g => g && src(g.image));
   const filters = $("#filters"), mas = $("#masonry");
-  filters.innerHTML = Object.entries(cats).map(([k, v], i) => `<button class="${i ? "" : "on"}" data-c="${k}">${v}</button>`).join("");
+  filters.innerHTML = Object.entries(cats).filter(([k]) => k === "all" || gal.some(g => g.category === k))
+    .map(([k, v], i) => `<button class="${i ? "" : "on"}" data-c="${k}">${v}</button>`).join("");
   let shown = [];
   const renderGal = c => {
-    shown = gal.filter(g => c === "all" || g[1] === c);
-    mas.innerHTML = shown.map((g, i) => `<figure data-i="${i}" style="animation-delay:${i * 30}ms"><img src="${img(g[0])}" alt="${g[2]}" loading="lazy"><figcaption>${g[2]}</figcaption></figure>`).join("");
+    shown = gal.filter(g => c === "all" || g.category === c);
+    mas.innerHTML = shown.map((g, i) => `<figure data-i="${i}" style="animation-delay:${i * 30}ms"><img src="${src(g.image)}" alt="${esc(g.caption)}" loading="lazy"><figcaption>${esc(g.caption)}</figcaption></figure>`).join("");
   };
   filters.addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
@@ -231,7 +263,7 @@
 
   const lb = $("#lightbox"), lbImg = $("#lbImg"), lbCap = $("#lbCap");
   let cur = 0;
-  const showLB = i => { cur = (i + shown.length) % shown.length; lbImg.src = img(shown[cur][0]); lbImg.alt = shown[cur][2]; lbCap.textContent = shown[cur][2]; };
+  const showLB = i => { cur = (i + shown.length) % shown.length; lbImg.src = src(shown[cur].image); lbImg.alt = shown[cur].caption || ""; lbCap.textContent = shown[cur].caption || ""; };
   mas.addEventListener("click", e => { const f = e.target.closest("figure"); if (!f) return; showLB(+f.dataset.i); lb.hidden = false; document.body.style.overflow = "hidden"; $("#lbX").focus(); });
   const closeLB = () => { lb.hidden = true; document.body.style.overflow = ""; };
   $("#lbX").addEventListener("click", closeLB);
@@ -252,14 +284,12 @@
     f.name.classList.remove("invalid");
     const ints = $$("input[name=i]:checked", f).map(x => x.value).join("، ") || "—";
     const msg = `السلام عليكم، أرغب في التطوع مع الهلال الأحمر المغربي بالحوز.\nالاسم: ${name}\nالسن: ${f.age.value || "—"}\nالجماعة: ${f.commune.value}\nمجالات الاهتمام: ${ints}`;
-    window.open(`https://wa.me/212668963619?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
   });
 
   /* ---------- partners marquee ---------- */
-  const partners = ["عمالة إقليم الحوز", "المديرية الإقليمية للتربية الوطنية", "المديرية الإقليمية للصحة", "الوقاية المدنية", "الدرك الملكي", "القوات المساعدة",
-    "الاتحاد الدولي للصليب الأحمر والهلال الأحمر", "الصليب الأحمر الفرنسي", "الصليب الأحمر الإسباني", "الهلال الأحمر الإماراتي", "USAID",
-    "جمعية شمس", "جمعية طريق النجاح", "جمعية تمزغارت أوريكا", "جمعية تنمية التعاون المدرسي", "الفضاء الجمعوي تحناوت"];
-  $("#marquee").innerHTML = [...partners, ...partners].map(p => `<span>${p}</span>`).join("");
+  const partners = list(partnersData).map(p => p && p.name).filter(Boolean);
+  $("#marquee").innerHTML = [...partners, ...partners].map(p => `<span>${esc(p)}</span>`).join("");
 
   /* ---------- counters, bars, reveal, active nav ---------- */
   const fmt = n => n.toLocaleString("en-US");
@@ -289,9 +319,10 @@
   const formEmbed = $("#formEmbed");
   const formSrc = (() => {
     try {
-      const u = new URL(TRAINING_FORM_URL);
+      const u = new URL(settings.training_form_url || "");
       if (!/(^|\.)docs\.google\.com$/.test(u.hostname) || !u.pathname.startsWith("/forms/")) return "";
       u.pathname = u.pathname.replace(/\/(edit|viewform)?$/, "/viewform");
+      u.search = "";
       u.searchParams.set("embedded", "true");
       return u.toString();
     } catch (e) { return ""; }
@@ -299,8 +330,8 @@
   if (formSrc) {
     formEmbed.innerHTML = `<div class="form-loading">جارٍ تحميل الاستمارة…</div>`;
     const loadForm = () => {
-      formEmbed.innerHTML = `<iframe src="${formSrc}" title="استمارة التسجيل في الدورات التكوينية" loading="lazy">جارٍ التحميل…</iframe>
-        <a class="form-open" href="${formSrc.replace("embedded=true", "usp=sf_link")}" target="_blank" rel="noopener">الاستمارة لا تظهر؟ افتحها في صفحة مستقلة ↗</a>`;
+      formEmbed.innerHTML = `<iframe src="${esc(formSrc)}" title="استمارة التسجيل في الدورات التكوينية" loading="lazy">جارٍ التحميل…</iframe>
+        <a class="form-open" href="${esc(formSrc.replace("embedded=true", "usp=sf_link"))}" target="_blank" rel="noopener">الاستمارة لا تظهر؟ افتحها في صفحة مستقلة ↗</a>`;
     };
     const fio = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { loadForm(); fio.disconnect(); } }, { rootMargin: "400px" });
     fio.observe(formEmbed);
@@ -310,7 +341,7 @@
       <div class="fp-icon">✚</div>
       <h3>الاستمارة الإلكترونية قيد الإعداد</h3>
       <p>إلى حين فتح التسجيل الإلكتروني، يمكنك تسجيل اهتمامك مباشرة عبر واتساب مع المكتب الإقليمي.</p>
-      <a class="btn btn-red" href="https://wa.me/212668963619?text=${msg}" target="_blank" rel="noopener">التسجيل عبر واتساب</a>
+      <a class="btn btn-red" href="https://wa.me/${esc(waNumber)}?text=${msg}" target="_blank" rel="noopener">التسجيل عبر واتساب</a>
     </div>`;
   }
 

@@ -141,6 +141,20 @@ blockquote{margin:0;font-size:clamp(1.1rem,2vw,1.45rem);font-weight:500;color:va
 .news-text h2{font-size:clamp(1.5rem,3vw,2.2rem)}
 .news-sub{color:var(--red);font-weight:800;font-size:1.1rem}
 .news-text p{color:var(--ink-2)}
+.news-img{width:100%;max-height:420px;object-fit:cover;border-radius:16px;margin:6px 0 18px}
+.news-text ul,.news-text ol,.modal-card .m-body ol{color:var(--ink-2);padding-inline-start:22px}
+.news-more-title{margin:44px 0 16px;font-size:1.3rem}
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.news-mini{display:flex;flex-direction:column;gap:6px;text-align:right;font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:0 0 18px;overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s}
+.news-mini:hover{transform:translateY(-3px);border-color:var(--red)}
+.news-mini img{width:100%;aspect-ratio:16/9;object-fit:cover;margin-bottom:6px}
+.news-mini > :not(img){padding:0 18px}
+.news-mini:not(:has(img)){padding-top:18px}
+.nm-date{color:var(--red);font-weight:800;font-size:.85rem}
+.news-mini b{font-size:1.05rem;line-height:1.5}
+.nm-sub{color:var(--muted);font-size:.92rem}
+.news-mini .more{margin-top:auto;font-weight:700;font-size:.88rem;color:var(--red)}
+.sos-phones{display:contents}
 .board-head{margin:70px 0 28px}
 .board{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .board li{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;display:grid;grid-template-columns:52px 1fr;column-gap:14px;align-items:center;transition:transform .2s,border-color .2s}
@@ -371,7 +385,7 @@ legend{font-weight:700;font-size:.92rem;padding:0 6px}
   .stat-grid,.field-grid{grid-template-columns:repeat(2,1fr)}
   .quake-facts{grid-template-columns:repeat(2,1fr)}
   .quake-body,.training-grid,.about-grid,.join-grid,.roadmap,.courses{grid-template-columns:1fr}
-  .board{grid-template-columns:repeat(2,1fr)}
+  .board,.news-grid{grid-template-columns:repeat(2,1fr)}
   .register-grid{grid-template-columns:1fr}
   .register-info{position:static}
 }
@@ -392,7 +406,7 @@ legend{font-weight:700;font-size:.92rem;padding:0 6px}
   .news-card{grid-template-columns:1fr}
   .news-date{position:static;flex-direction:row;justify-content:center;gap:8px;align-items:baseline;padding:10px}
   .news-date b{font-size:2rem}
-  .board,.pillars,.course-list,.reg-courses{grid-template-columns:1fr}
+  .board,.pillars,.course-list,.reg-courses,.news-grid{grid-template-columns:1fr}
   .form-embed iframe{height:1450px}
   .field{min-height:280px}
   .lb-prev,.lb-next{top:auto;bottom:18px}

@@ -22,8 +22,7 @@
     <a href="tel:141">الإسعاف الطبي <b>141</b></a>
     <a href="tel:19">الشرطة <b>19</b></a>
     <a href="tel:177">الدرك الملكي <b>177</b></a>
-    <a class="sos-branch" href="tel:+212668963619">الهلال الأحمر – الحوز <b dir="ltr">+212668963619</b></a>
-    <a class="sos-branch" href="tel:+212657048071">الهلال الأحمر – الحوز <b dir="ltr">+212657048071</b></a>
+    <span class="sos-phones" id="sosPhones"></span>
   </div>
 </div>
 
@@ -38,7 +37,7 @@
     </a>
     <nav class="nav" id="nav">
       <a href="#about">من نحن</a>
-      <a href="#assembly">المكتب الجديد</a>
+      <a href="#assembly">الأخبار والمكتب</a>
       <a href="#register">التسجيل</a>
       <a href="#fields">مجالاتنا</a>
       <a href="#quake">زلزال الحوز</a>
@@ -70,16 +69,16 @@
     <path class="snow" d="M260 50l-26 22 14-2 12 10 14-12 16 6zM650 10l-34 30 18-4 16 12 18-14 20 6z"/>
   </svg>
   <div class="wrap hero-content">
-    <p class="eyebrow">موجز أنشطة المكتب الإقليمي · 2022 ← 2025</p>
-    <h1>إنسانيةٌ<br><span class="hl">تسكن الجبل.</span></h1>
-    <p class="lead">من دواوير الأطلس الكبير إلى ساحات المدارس، يقف متطوعو الهلال الأحمر المغربي بالحوز إلى جانب الساكنة: يسعفون ويكوّنون ويساندون الأسر، وقد كانوا في الميدان منذ الساعات الأولى لزلزال 2023.</p>
+    <p class="eyebrow" data-c="hero_eyebrow">موجز أنشطة المكتب الإقليمي · 2022 ← 2025</p>
+    <h1><span data-c="hero_title_1">إنسانيةٌ</span><br><span class="hl" data-c="hero_title_2">تسكن الجبل.</span></h1>
+    <p class="lead" data-c="hero_lead">من دواوير الأطلس الكبير إلى ساحات المدارس، يقف متطوعو الهلال الأحمر المغربي بالحوز إلى جانب الساكنة: يسعفون ويكوّنون ويساندون الأسر، وقد كانوا في الميدان منذ الساعات الأولى لزلزال 2023.</p>
     <div class="hero-cta">
       <a href="#join" class="btn btn-red">انضم إلى المتطوعين</a>
       <a href="#numbers" class="btn btn-ghost">اكتشف حصيلتنا ↓</a>
     </div>
   </div>
   <div class="hero-badge" aria-hidden="true">
-    <span>منذ</span><b>2004</b><span>في خدمة الإقليم</span>
+    <span>منذ</span><b data-c="since_year">2004</b><span>في خدمة الإقليم</span>
   </div>
 </section>
 
@@ -96,17 +95,10 @@
   <div class="wrap">
     <div class="sec-head light">
       <span class="kicker">الحصيلة بالأرقام</span>
-      <h2>22 سنة من العمل الميداني والعطاء الإنساني</h2>
-      <p>أرقام مستخرجة من التقرير الموجز لأنشطة المكتب إلى غاية 31 مارس 2025.</p>
+      <h2 id="statsTitle"></h2>
+      <p id="statsSub"></p>
     </div>
-    <div class="stat-grid">
-      <div class="stat"><b class="count" data-to="3600">0</b><span>مستفيد من 45 دورة تحسيسية</span></div>
-      <div class="stat"><b class="count" data-to="3530">0</b><span>تلميذًا في حملة النظافة والوقاية بثماني مؤسسات</span></div>
-      <div class="stat"><b class="count" data-to="3200">0</b><span>مستفيد من الحملة الطبية لجراحة العيون بتحناوت</span></div>
-      <div class="stat"><b class="count" data-to="3000">0</b><span>متعلّم في برنامج السلامة الطرقية بثلاثين مؤسسة</span></div>
-      <div class="stat"><b class="count" data-to="582">0</b><span>مستفيد من 14 دورة في الإسعافات الأولية الأساسية</span></div>
-      <div class="stat"><b class="count" data-to="45">0</b><span>متطوعة ومتطوعًا في الأشهر الأولى بعد الزلزال</span></div>
-    </div>
+    <div class="stat-grid" id="statsGrid"></div>
   </div>
 </section>
 
@@ -139,45 +131,21 @@
 <!-- ========== GENERAL ASSEMBLY 2025 ========== -->
 <section class="assembly" id="assembly">
   <div class="wrap">
-    <div class="news-card">
-      <div class="news-date" aria-hidden="true"><b>18</b><span>ماي</span><span>2025</span></div>
-      <div class="news-text">
-        <span class="kicker">آخر الأخبار</span>
-        <h2>الجمع العام التجديدي للمكتب الإقليمي للهلال الأحمر المغربي بإقليم الحوز</h2>
-        <p class="news-sub">خطوة جديدة نحو تعزيز العمل الإنساني والتطوعي</p>
-        <p>صبيحة يوم الأحد 18 ماي 2025، احتضن المقر المركزي للهلال الأحمر المغربي بتحناوت، بإقليم الحوز، أشغال الجمع العام التجديدي للمكتب الإقليمي، بحضور أعضاء المكتب الإقليمي، ومنبهات ومنبهي الإقليم، وممثلي المسعفين وممرضي المراكز العلاجية بالإقليم.</p>
-        <p>وشكّل هذا الجمع العام محطة مهمة لتقييم حصيلة العمل خلال الفترة السابقة، واستشراف آفاق جديدة لتطوير العمل الإنساني والتطوعي، وتعزيز حضور الهلال الأحمر المغربي بمختلف مناطق الإقليم، ولا سيما المناطق النائية.</p>
-        <p>واستُهلت أشغال الجمع العام بأداء النشيد الوطني، تلتها كلمات ترحيبية لرئيس المكتب الإقليمي، استعرض خلالها أبرز المحطات التي طبعت مسار الجمعية خلال الفترة الماضية، خاصة في مجالات الاستجابة لحالات الطوارئ، وتقديم الدعم الاجتماعي، وتنظيم الحملات الصحية، والتكوين، والتحسيس والتوعية المجتمعية.</p>
-        <p>وقد أسفرت نتائج الجمع العام عن تجديد الثقة في السيد مصطفى عصبان رئيسًا للمكتب الإقليمي، تقديرًا لجهوده وخبرته في مجال العمل الإنساني، كما تم انتخاب التشكيلة الجديدة للمكتب.</p>
-      </div>
-    </div>
+    <div id="newsList" class="news-list"></div>
 
     <div class="sec-head board-head">
       <span class="kicker">التشكيلة الجديدة</span>
       <h2>أعضاء المكتب الإقليمي</h2>
     </div>
-    <ul class="board">
-      <li class="board-lead"><span class="b-ini">م</span><b>مصطفى عصبان</b><span>رئيس المكتب الإقليمي</span></li>
-      <li><span class="b-ini">ع</span><b>عبد أيت بابو</b><span>نائب الرئيس</span></li>
-      <li><span class="b-ini">ع</span><b>عبد الرحمان كرنان</b><span>الكاتب العام</span></li>
-      <li><span class="b-ini">ع</span><b>علال بن علال</b><span>نائب الكاتب العام</span></li>
-      <li><span class="b-ini">م</span><b>اليعقوبي محمد</b><span>أمين المال</span></li>
-      <li><span class="b-ini">ف</span><b>فاطمة مجعو</b><span>نائبة أمين المال</span></li>
-      <li><span class="b-ini">ع</span><b>عبد اللطيف الجعيدي</b><span>مستشار</span></li>
-    </ul>
+    <ul class="board" id="board"></ul>
 
     <div class="roadmap">
       <div class="roadmap-intro">
         <span class="kicker">خارطة الطريق</span>
-        <h2>2025 – 2028</h2>
-        <p>في ختام أشغال الجمع العام، عقد أعضاء المكتب الجديد اجتماعًا خُصص لوضع اللبنات الأساسية لخارطة طريق المرحلة الممتدة من 2025 إلى 2028.</p>
+        <h2 id="roadmapTitle"></h2>
+        <p id="roadmapIntro"></p>
       </div>
-      <ol class="pillars">
-        <li><b>تعزيز التكوين</b><span>تأهيل المتطوعات والمتطوعين وتطوير قدرات الموارد البشرية.</span></li>
-        <li><b>توسيع شبكة الشراكات</b><span>مع المؤسسات والسلطات وجمعيات المجتمع المدني.</span></li>
-        <li><b>تعبئة موارد إضافية</b><span>البحث عن موارد جديدة لدعم أنشطة الجمعية.</span></li>
-        <li><b>الحضور الميداني</b><span>تكثيف التدخلات الإنسانية بالمناطق النائية بالإقليم.</span></li>
-      </ol>
+      <ol class="pillars" id="pillars"></ol>
     </div>
 
     <div class="courses">
@@ -187,15 +155,7 @@
         <p>في إطار تطوير قدرات الموارد البشرية وتأهيل المتطوعات والمتطوعين، يولي المكتب الإقليمي أهمية خاصة للتكوين والتأطير.</p>
         <a href="#register" class="btn btn-red btn-sm">سجّل في دورة تكوينية</a>
       </div>
-      <ol class="course-list">
-        <li>الإسعافات الأولية الأساسية</li>
-        <li>التمريض</li>
-        <li>الإسعاف الرياضي</li>
-        <li>الإسعاف المهني</li>
-        <li>الإسعاف التجاري</li>
-        <li>تكوين سائقي سيارات الإسعاف</li>
-        <li>الصحة النفسية والدعم النفسي</li>
-      </ol>
+      <ol class="course-list" id="courseList"></ol>
     </div>
   </div>
 </section>
@@ -207,14 +167,7 @@
       <span class="kicker">التسجيل مفتوح</span>
       <h2>سجّل للاستفادة من دوراتنا التكوينية</h2>
       <p>املأ الاستمارة لتسجيل اهتمامك بإحدى الدورات، وسيتواصل معك المكتب الإقليمي عند برمجة الدورة المناسبة لك.</p>
-      <ul class="reg-courses">
-        <li><span>01</span>الإسعافات الأولية الأساسية</li>
-        <li><span>02</span>التمريض</li>
-        <li><span>03</span>الإسعاف الرياضي</li>
-        <li><span>04</span>الإسعاف المهني</li>
-        <li><span>05</span>الإسعاف التجاري</li>
-        <li><span>06</span>تكوين سائقي سيارات الإسعاف</li>
-      </ul>
+      <ul class="reg-courses" id="regCourses"></ul>
       <ol class="reg-steps">
         <li>اختر الدورة أو الدورات التي تهمك</li>
         <li>أرسل الاستمارة</li>
@@ -393,13 +346,7 @@
     </div>
     <div>
       <h4>تواصل معنا</h4>
-      <ul class="contact-list">
-        <li><span>الهاتف</span><a href="tel:+212668963619" dir="ltr">06 68 96 36 19</a></li>
-        <li><span>الهاتف</span><a href="tel:+212657048071" dir="ltr">06 57 04 80 71</a></li>
-        <li><span>واتساب</span><a href="https://wa.me/212668963619" target="_blank" rel="noopener">راسلنا مباشرة</a></li>
-        <li><span>العنوان</span>تحناوت، إقليم الحوز، جهة مراكش آسفي</li>
-        <li><span>فيسبوك</span>الهلال الأحمر المغربي الحوز</li>
-      </ul>
+      <ul class="contact-list" id="contactList"></ul>
     </div>
     <div>
       <h4>روابط سريعة</h4>
