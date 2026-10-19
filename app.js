@@ -3,6 +3,12 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const img = n => `images/${n}.jpg`;
 
+  /* ---------- Google Form for training registration ----------
+     Paste the form link here (Google Forms → إرسال → رابط),
+     e.g. "https://docs.google.com/forms/d/e/XXXXXXXX/viewform".
+     Leave it empty to show the "registration opens soon" card. */
+  const TRAINING_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe64QAoSsIo4RwhGbA25mPMlbVId9IgY4EgDy_UlxWsrjj2ag/viewform";
+
   /* ---------- theme ---------- */
   const root = document.documentElement;
   try { const t = localStorage.getItem("theme"); if (t) root.dataset.theme = t; } catch (e) {}
@@ -278,6 +284,35 @@
     if (e.isIntersecting) links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id));
   }), { rootMargin: "-45% 0px -50% 0px" });
   $$("main section[id], footer[id]").forEach(s => secIO.observe(s));
+
+  /* ---------- training registration form ---------- */
+  const formEmbed = $("#formEmbed");
+  const formSrc = (() => {
+    try {
+      const u = new URL(TRAINING_FORM_URL);
+      if (!/(^|\.)docs\.google\.com$/.test(u.hostname) || !u.pathname.startsWith("/forms/")) return "";
+      u.pathname = u.pathname.replace(/\/(edit|viewform)?$/, "/viewform");
+      u.searchParams.set("embedded", "true");
+      return u.toString();
+    } catch (e) { return ""; }
+  })();
+  if (formSrc) {
+    formEmbed.innerHTML = `<div class="form-loading">جارٍ تحميل الاستمارة…</div>`;
+    const loadForm = () => {
+      formEmbed.innerHTML = `<iframe src="${formSrc}" title="استمارة التسجيل في الدورات التكوينية" loading="lazy">جارٍ التحميل…</iframe>
+        <a class="form-open" href="${formSrc.replace("embedded=true", "usp=sf_link")}" target="_blank" rel="noopener">الاستمارة لا تظهر؟ افتحها في صفحة مستقلة ↗</a>`;
+    };
+    const fio = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { loadForm(); fio.disconnect(); } }, { rootMargin: "400px" });
+    fio.observe(formEmbed);
+  } else {
+    const msg = encodeURIComponent("السلام عليكم، أرغب في التسجيل في إحدى الدورات التكوينية للهلال الأحمر المغربي بالحوز.");
+    formEmbed.innerHTML = `<div class="form-pending">
+      <div class="fp-icon">✚</div>
+      <h3>الاستمارة الإلكترونية قيد الإعداد</h3>
+      <p>إلى حين فتح التسجيل الإلكتروني، يمكنك تسجيل اهتمامك مباشرة عبر واتساب مع المكتب الإقليمي.</p>
+      <a class="btn btn-red" href="https://wa.me/212668963619?text=${msg}" target="_blank" rel="noopener">التسجيل عبر واتساب</a>
+    </div>`;
+  }
 
   $("#yr").textContent = new Date().getFullYear();
 })();

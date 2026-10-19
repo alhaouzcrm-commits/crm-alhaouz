@@ -168,6 +168,29 @@ blockquote{margin:0;font-size:clamp(1.1rem,2vw,1.45rem);font-weight:500;color:va
 .course-list li::before{content:counter(c);width:32px;height:32px;flex:none;border-radius:10px;background:var(--red);color:#fff;display:grid;place-items:center;font-size:.9rem}
 .course-list li:last-child{grid-column:1/-1}
 
+/* training registration (Google Forms embed) */
+.register{background:var(--bg-2)}
+.register-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(28px,5vw,60px);align-items:start}
+.register-info{position:sticky;top:100px}
+.register-info p{color:var(--ink-2)}
+.reg-courses{list-style:none;padding:0;margin:20px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.reg-courses li{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:700;font-size:.95rem}
+.reg-courses span{font-family:var(--display);color:var(--red);font-size:.9rem}
+.reg-steps{list-style:none;padding:0;margin:0;display:grid;gap:10px;counter-reset:r}
+.reg-steps li{counter-increment:r;display:flex;align-items:center;gap:12px;color:var(--ink-2)}
+.reg-steps li::before{content:counter(r);width:28px;height:28px;flex:none;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:800;font-size:.85rem}
+.form-shell{background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
+.form-shell-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;background:var(--red);color:#fff}
+.form-shell-bar span{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.45)}
+.form-shell-bar b{margin-inline-start:8px;font-size:.95rem}
+.form-embed iframe{display:block;width:100%;height:1250px;border:0;background:#fff}
+.form-loading{display:grid;place-items:center;height:240px;color:var(--muted)}
+.form-pending{padding:clamp(24px,4vw,40px);text-align:center;display:grid;gap:14px;justify-items:center}
+.form-pending .fp-icon{width:64px;height:64px;border-radius:50%;background:var(--red-l);color:var(--red);display:grid;place-items:center;font-size:1.8rem}
+.form-pending h3{margin:0}
+.form-pending p{margin:0;color:var(--muted);max-width:420px}
+.form-open{display:block;text-align:center;padding:12px;font-weight:700;font-size:.9rem;border-top:1px solid var(--line);color:var(--red)}
+
 /* fields */
 .fields{background:var(--bg-2)}
 .field-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
@@ -338,6 +361,7 @@ legend{font-weight:700;font-size:.92rem;padding:0 6px}
 .reveal.in{opacity:1;transform:none}
 
 /* responsive */
+@media (max-width:1240px){.nav a{padding:.4em .55em;font-size:.9rem}}
 @media (max-width:1060px){
   .nav{position:fixed;inset:72px 0 auto 0;flex-direction:column;background:var(--bg);padding:12px 16px 20px;border-bottom:1px solid var(--line);transform:translateY(-120%);transition:transform .3s;z-index:-1;box-shadow:var(--shadow)}
   .nav.open{transform:none}
@@ -348,6 +372,8 @@ legend{font-weight:700;font-size:.92rem;padding:0 6px}
   .quake-facts{grid-template-columns:repeat(2,1fr)}
   .quake-body,.training-grid,.about-grid,.join-grid,.roadmap,.courses{grid-template-columns:1fr}
   .board{grid-template-columns:repeat(2,1fr)}
+  .register-grid{grid-template-columns:1fr}
+  .register-info{position:static}
 }
 @media (max-width:640px){
   body{font-size:16px}
@@ -366,7 +392,8 @@ legend{font-weight:700;font-size:.92rem;padding:0 6px}
   .news-card{grid-template-columns:1fr}
   .news-date{position:static;flex-direction:row;justify-content:center;gap:8px;align-items:baseline;padding:10px}
   .news-date b{font-size:2rem}
-  .board,.pillars,.course-list{grid-template-columns:1fr}
+  .board,.pillars,.course-list,.reg-courses{grid-template-columns:1fr}
+  .form-embed iframe{height:1450px}
   .field{min-height:280px}
   .lb-prev,.lb-next{top:auto;bottom:18px}
 }
