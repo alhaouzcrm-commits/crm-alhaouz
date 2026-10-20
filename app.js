@@ -14,7 +14,7 @@
   const src = p => { p = String(p || "").trim(); return /^(https:\/\/|\/|images\/)/.test(p) && !/^\/\//.test(p) ? esc(p) : ""; };
   const digits = n => String(n || "").replace(/[^\d+]/g, "");
   const localPhone = n => { const d = digits(n); return d.startsWith("+212") ? ("0" + d.slice(4)).replace(/(\d{2})(?=\d)/g, "$1 ").trim() : d; };
-  const waNumber = digits(settings.whatsapp || "+212668963619").replace("+", "");
+  const waNumber = digits(settings.whatsapp || "+212657048071").replace("+", "");
   const months = ["يناير", "فبراير", "مارس", "أبريل", "ماي", "يونيو", "يوليوز", "غشت", "شتنبر", "أكتوبر", "نونبر", "دجنبر"];
   const parseDate = d => { const m = String(d || "").match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? { y: m[1], m: months[+m[2] - 1] || "", d: String(+m[3]) } : null; };
   // Minimal markdown: paragraphs, "* " / "- " / "1. " lists, **bold**.
