@@ -1,0 +1,212 @@
+# Decap CMS: the admin panel at /admin
+# Edits are saved as drafts (pull requests). Publishing one merges it into main,
+# and Vercel republishes the site. People without write access to the repo can
+# still propose edits (open authoring); only a maintainer can publish them.
+backend:
+  name: github
+  repo: alhaouzcrm-commits/crm-alhaouz
+  branch: main
+  base_url: https://www.crm-alhaouz.online
+  auth_endpoint: api/auth
+  open_authoring: true
+  commit_messages:
+    update: "تحديث {{slug}} من لوحة التحكم"
+    uploadMedia: "رفع صورة {{path}}"
+    deleteMedia: "حذف صورة {{path}}"
+    openAuthoring: "اقتراح تعديل من {{author-login}}: {{message}}"
+
+publish_mode: editorial_workflow
+
+locale: fr
+site_url: https://www.crm-alhaouz.online
+display_url: https://www.crm-alhaouz.online
+media_folder: images/uploads
+public_folder: /images/uploads
+
+collections:
+  - name: content
+    label: "محتوى الموقع"
+    editor: { preview: false }
+    files:
+
+      - name: news
+        label: "📰 الأخبار"
+        file: content/news.json
+        fields:
+          - label: "الأخبار"
+            name: items
+            widget: list
+            label_singular: "خبر"
+            summary: "{{fields.date}} — {{fields.title}}"
+            hint: "يظهر الخبر الأحدث (حسب التاريخ) في أعلى القسم، والباقي في «أخبار سابقة»."
+            fields:
+              - { label: "العنوان", name: title, widget: string }
+              - { label: "العنوان الفرعي", name: subtitle, widget: string, required: false }
+              - { label: "التاريخ", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD" }
+              - { label: "صورة", name: image, widget: image, required: false, choose_url: false }
+              - { label: "نص الخبر", name: body, widget: markdown, buttons: [bold, bulleted-list, numbered-list], editor_components: [], modes: [rich_text], hint: "اترك سطرًا فارغًا بين الفقرات." }
+
+      - name: office
+        label: "👥 المكتب الإقليمي وخارطة الطريق"
+        file: content/office.json
+        fields:
+          - label: "أعضاء المكتب"
+            name: members
+            widget: list
+            label_singular: "عضو"
+            summary: "{{fields.role}}: {{fields.name}}"
+            fields:
+              - { label: "الاسم", name: name, widget: string }
+              - { label: "المهمة", name: role, widget: string }
+              - { label: "إبراز البطاقة (للرئيس)", name: lead, widget: boolean, default: false }
+          - { label: "عنوان خارطة الطريق", name: roadmap_title, widget: string }
+          - { label: "مقدمة خارطة الطريق", name: roadmap_intro, widget: text }
+          - label: "محاور خارطة الطريق"
+            name: pillars
+            widget: list
+            label_singular: "محور"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "المحور", name: title, widget: string }
+              - { label: "الشرح", name: text, widget: string }
+
+      - name: courses
+        label: "🎓 الدورات التكوينية"
+        file: content/courses.json
+        fields:
+          - label: "الدورات"
+            name: items
+            widget: list
+            label_singular: "دورة"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "اسم الدورة", name: title, widget: string }
+              - { label: "تظهر في قسم التسجيل", name: registration, widget: boolean, default: true }
+
+      - name: stats
+        label: "🔢 الأرقام"
+        file: content/stats.json
+        fields:
+          - { label: "عنوان القسم", name: title, widget: string }
+          - { label: "النص تحت العنوان", name: subtitle, widget: string, required: false }
+          - label: "الأرقام"
+            name: items
+            widget: list
+            label_singular: "رقم"
+            summary: "{{fields.value}} — {{fields.label}}"
+            fields:
+              - { label: "الرقم", name: value, widget: number, value_type: int, min: 0 }
+              - { label: "الوصف", name: label, widget: string }
+
+      - name: timeline
+        label: "🗓️ المسار (المحطات)"
+        file: content/timeline.json
+        fields:
+          - label: "المحطات"
+            name: items
+            widget: list
+            label_singular: "محطة"
+            add_to_top: false
+            summary: "{{fields.year}} · {{fields.date}} — {{fields.title}}"
+            hint: "تظهر المحطات بالترتيب نفسه. أضف المحطة الجديدة في آخر القائمة."
+            fields:
+              - { label: "السنة", name: year, widget: string, pattern: ["^\\d{4}$", "أدخل السنة بأربعة أرقام، مثل 2025"] }
+              - { label: "التاريخ (مثل: 18 ماي)", name: date, widget: string }
+              - label: "الأيقونة"
+                name: icon
+                widget: select
+                default: "✚"
+                options:
+                  - { label: "✚ تكوين / إسعاف", value: "✚" }
+                  - { label: "◉ صحة / قافلة طبية", value: "◉" }
+                  - { label: "♥ تضامن / مساعدات", value: "♥" }
+                  - { label: "⚑ تحسيس / مناسبة", value: "⚑" }
+                  - { label: "★ حدث مؤسساتي", value: "★" }
+                  - { label: "▲ طوارئ", value: "▲" }
+              - { label: "العنوان", name: title, widget: string }
+              - { label: "الوصف", name: text, widget: string }
+
+      - name: gallery
+        label: "🖼️ معرض الصور"
+        file: content/gallery.json
+        fields:
+          - label: "الصور"
+            name: items
+            widget: list
+            label_singular: "صورة"
+            summary: "{{fields.caption}}"
+            hint: "يُفضَّل رفع صور لا يتجاوز حجمها 1 ميغابايت تقريبًا حتى يبقى الموقع سريعًا."
+            fields:
+              - { label: "الصورة", name: image, widget: image, choose_url: false }
+              - label: "التصنيف"
+                name: category
+                widget: select
+                default: general
+                options:
+                  - { label: "عام", value: general }
+                  - { label: "التكوين", value: fa }
+                  - { label: "الصحة", value: h }
+                  - { label: "الزلزال", value: eq }
+                  - { label: "الرياضة", value: s }
+                  - { label: "السلامة الطرقية", value: r }
+                  - { label: "التضامن", value: so }
+              - { label: "وصف الصورة", name: caption, widget: string }
+
+      - name: fields
+        label: "🧭 مجالات التدخل"
+        file: content/fields.json
+        fields:
+          - label: "المجالات"
+            name: items
+            widget: list
+            label_singular: "مجال"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "اسم المجال", name: title, widget: string }
+              - { label: "جملة قصيرة على البطاقة", name: summary, widget: string }
+              - { label: "صورة البطاقة", name: image, widget: image, choose_url: false }
+              - label: "أبرز الإنجازات"
+                name: points
+                widget: list
+                label_singular: "إنجاز"
+                field: { label: "الإنجاز", name: point, widget: string }
+              - label: "صور إضافية"
+                name: photos
+                widget: list
+                label_singular: "صورة"
+                field: { label: "صورة", name: photo, widget: image, choose_url: false }
+
+      - name: partners
+        label: "🤝 الشركاء"
+        file: content/partners.json
+        fields:
+          - label: "الشركاء"
+            name: items
+            widget: list
+            label_singular: "شريك"
+            summary: "{{fields.name}}"
+            fields:
+              - { label: "اسم الشريك", name: name, widget: string }
+
+      - name: settings
+        label: "⚙️ الإعدادات العامة"
+        file: content/settings.json
+        fields:
+          - { label: "النص الصغير أعلى الواجهة", name: hero_eyebrow, widget: string }
+          - { label: "العنوان الكبير – السطر الأول", name: hero_title_1, widget: string }
+          - { label: "العنوان الكبير – السطر الثاني (بالأحمر)", name: hero_title_2, widget: string }
+          - { label: "النص تحت العنوان", name: hero_lead, widget: text }
+          - { label: "سنة التأسيس (في الدائرة الحمراء)", name: since_year, widget: string }
+          - label: "أرقام الهاتف"
+            name: phones
+            widget: list
+            label_singular: "رقم"
+            summary: "{{fields.number}}"
+            fields:
+              - { label: "التسمية", name: label, widget: string, default: "الهلال الأحمر – الحوز" }
+              - { label: "الرقم (بصيغة ‎+212…)", name: number, widget: string }
+          - { label: "رقم واتساب (بصيغة ‎+212…)", name: whatsapp, widget: string }
+          - { label: "العنوان", name: address, widget: string }
+          - { label: "اسم صفحة فيسبوك", name: facebook_name, widget: string, required: false }
+          - { label: "رابط صفحة فيسبوك", name: facebook_url, widget: string, required: false, hint: "يبدأ بـ https://" }
+          - { label: "رابط استمارة Google للتسجيل في الدورات", name: training_form_url, widget: string, required: false, hint: "الرابط الكامل الذي يبدأ بـ https://docs.google.com/forms/ . اتركه فارغًا لإظهار زر واتساب بدل الاستمارة." }
