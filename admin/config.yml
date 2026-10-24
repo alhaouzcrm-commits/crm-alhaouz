@@ -6,7 +6,7 @@ backend:
   name: github
   repo: alhaouzcrm-commits/crm-alhaouz
   branch: main
-  base_url: https://crm-alhaouz.online
+  base_url: https://www.crm-alhaouz.online
   auth_endpoint: api/auth
   open_authoring: true
   commit_messages:
@@ -18,8 +18,8 @@ backend:
 publish_mode: editorial_workflow
 
 locale: fr
-site_url: https://crm-alhaouz.online
-display_url: https://crm-alhaouz.online
+site_url: https://www.crm-alhaouz.online
+display_url: https://www.crm-alhaouz.online
 media_folder: images/uploads
 public_folder: /images/uploads
 
