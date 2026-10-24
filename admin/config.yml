@@ -4,7 +4,7 @@
 # still propose edits (open authoring); only a maintainer can publish them.
 backend:
   name: github
-  repo: profamine/crm-alhaouz
+  repo: alhaouzcrm-commits/crm-alhaouz
   branch: main
   base_url: https://crm-alhaouz.online
   auth_endpoint: api/auth
