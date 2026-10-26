@@ -20,7 +20,7 @@ publish_mode: editorial_workflow
 locale: fr
 site_url: https://www.crm-alhaouz.online
 display_url: https://www.crm-alhaouz.online
-media_folder: images/uploads
+media_folder: public/images/uploads
 public_folder: /images/uploads
 
 collections:
@@ -31,7 +31,7 @@ collections:
 
       - name: news
         label: "📰 الأخبار"
-        file: content/news.json
+        file: public/content/news.json
         fields:
           - label: "الأخبار"
             name: items
@@ -48,7 +48,7 @@ collections:
 
       - name: office
         label: "👥 المكتب الإقليمي وخارطة الطريق"
-        file: content/office.json
+        file: public/content/office.json
         fields:
           - label: "أعضاء المكتب"
             name: members
@@ -72,7 +72,7 @@ collections:
 
       - name: courses
         label: "🎓 الدورات التكوينية"
-        file: content/courses.json
+        file: public/content/courses.json
         fields:
           - label: "الدورات"
             name: items
@@ -85,7 +85,7 @@ collections:
 
       - name: stats
         label: "🔢 الأرقام"
-        file: content/stats.json
+        file: public/content/stats.json
         fields:
           - { label: "عنوان القسم", name: title, widget: string }
           - { label: "النص تحت العنوان", name: subtitle, widget: string, required: false }
@@ -100,7 +100,7 @@ collections:
 
       - name: timeline
         label: "🗓️ المسار (المحطات)"
-        file: content/timeline.json
+        file: public/content/timeline.json
         fields:
           - label: "المحطات"
             name: items
@@ -128,7 +128,7 @@ collections:
 
       - name: gallery
         label: "🖼️ معرض الصور"
-        file: content/gallery.json
+        file: public/content/gallery.json
         fields:
           - label: "الصور"
             name: items
@@ -154,7 +154,7 @@ collections:
 
       - name: fields
         label: "🧭 مجالات التدخل"
-        file: content/fields.json
+        file: public/content/fields.json
         fields:
           - label: "المجالات"
             name: items
@@ -178,7 +178,7 @@ collections:
 
       - name: partners
         label: "🤝 الشركاء"
-        file: content/partners.json
+        file: public/content/partners.json
         fields:
           - label: "الشركاء"
             name: items
@@ -190,7 +190,7 @@ collections:
 
       - name: settings
         label: "⚙️ الإعدادات العامة"
-        file: content/settings.json
+        file: public/content/settings.json
         fields:
           - { label: "النص الصغير أعلى الواجهة", name: hero_eyebrow, widget: string }
           - { label: "العنوان الكبير – السطر الأول", name: hero_title_1, widget: string }
